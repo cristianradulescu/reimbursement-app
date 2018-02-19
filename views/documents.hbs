@@ -14,10 +14,16 @@
     <tr>
       <th scope="row">{{this.id}}</th>
       <td>{{this.employee.fullName}}</td>
-      <td>{{this.status.name}}</td>
-      <td>{{this.type_id}}</td>
+      <td>{{> status_badge status_id=this.status_id status=this.status.name }}</td>
+      <td>{{this.type.name}}</td>
       <td>120</td>
-      <td>Print | Show | Edit | Delete</td>
+      <td>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
+          <button type="button" class="btn btn-secondary"><span data-feather="printer"></span></button>
+          <button type="button" class="btn btn-secondary"><span data-feather="eye"></span></button>
+          <button type="button" class="btn btn-secondary"><span data-feather="edit"></span></button>
+        </div>
+      </td>
     </tr>
     {{/each}}
   </tbody>
