@@ -1,0 +1,24 @@
+<table class="table table-sm table-striped table-hover">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Employee</th>
+      <th scope="col">Status</th>
+      <th scope="col">Type</th>
+      <th scope="col">Total</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each documents}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <td>{{this.employee.fullName}}</td>
+      <td>{{this.status.name}}</td>
+      <td>{{this.type_id}}</td>
+      <td>120</td>
+      <td>Print | Show | Edit | Delete</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

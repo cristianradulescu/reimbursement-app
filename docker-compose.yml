@@ -1,0 +1,39 @@
+version: '3'
+
+volumes:
+  mysqldata:
+    driver: local
+
+services:
+  nodeserver: 
+    build: docker/node
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
+      - 9229:9229
+    expose:
+      - 3000
+      - 9229
+    environment:
+      DB_USER: user
+      DB_PASSWORD: pass
+      DB_HOST: mysqlserver
+      DB_DATABASE: reimbursement
+    command: "npm run startmon"
+    # command: "nodemon -L --inspect-brk=0.0.0.0:9229 ./bin/www"
+
+  mysqlserver:
+    image: mysql/mysql-server
+    environment:
+      MYSQL_DATABASE: reimbursement
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: passroot
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
