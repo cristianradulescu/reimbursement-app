@@ -18,6 +18,7 @@
     "mysql2": "^1.5.2",
     "popper.js": "^1.12.9",
     "sequelize": "^4.33.4",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "swag": "^0.7.0"
   }
 }

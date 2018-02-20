@@ -27,10 +27,30 @@ router.get('/', function(req, res, next) {
   )
   .then(documents => {
       res.render(
-        'documents', 
+        'documents/list', 
         { 
-          title: 'Reimbursements',
+          title: 'Reimbursement | List documents',
           documents: documents
+        }
+      );
+    })
+  });
+
+  router.get('/show/:documentId', function(req, res, next) {
+    debugger
+    model.DocumentModel.findById(
+      req.params.documentId,
+      { 
+        include: ['employee', 'status', 'type'] 
+      }
+    )
+    .then(document => {
+      debugger
+      res.render(
+        'documents/show', 
+        { 
+          title: `Reimbursement | Show document #${document.id}`,
+          document: document
         }
       );
     })

@@ -8,3 +8,7 @@ body {
   height: 16px;
   vertical-align: text-bottom;
 }
+
+.table .showpage-container-row th {
+  width: 130px;
+}
