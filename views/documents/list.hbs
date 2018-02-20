@@ -18,11 +18,15 @@
   <tbody>
     {{#each documents}}
     <tr>
-      <th scope="row">{{this.id}}</th>
+      <th scope="row">
+        <a href="/documents/show/{{this.id}}">
+         {{this.id}}
+         </a>
+      </th>
       <td>{{this.employee.fullName}}</td>
-      <td>{{> status_badge status_id=this.status_id status=this.status.name }}</td>
-      <td>{{this.type.name}}</td>
-      <td>{{this.totalAmount}}</td>
+      <td>{{> document_status_badge status_id=this.status_id status=this.status.name }}</td>
+      <td>{{> document_type_icon type_id=this.type_id }}</td>
+      <td class="text-right">{{this.totalAmount}}</td>
       <td>
         <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
           <a class="btn btn-secondary" href="/documents/print/{{this.id}}">
