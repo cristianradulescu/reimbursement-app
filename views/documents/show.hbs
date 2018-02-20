@@ -22,11 +22,15 @@
     </tr>
     <tr class="showpage-container-row">
       <th scope="row">Status</th>
-      <td>{{document.status.name}}</td>
+      <td>{{> status_badge status_id=document.status_id status=document.status.name }}</td>
     </tr>
     <tr class="showpage-container-row">
       <th scope="row">Type</th>
       <td>{{document.type.name}}</td>
+    </tr>
+    <tr class="showpage-container-row">
+      <th scope="row">Total</th>
+      <td>{{document.totalAmount}}</td>
     </tr>
     <tr class="showpage-container-row">
       <th scope="row">Created</th>

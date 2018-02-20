@@ -22,7 +22,7 @@ router.get('/', function(req, res, next) {
   model.DocumentModel.findAll(
     { 
       order: [['status_id', 'ASC'], ['updated_at', 'DESC']], 
-      include: ['employee', 'status', 'type'] 
+      include: ['employee', 'status', 'type', 'reimbursements', 'travel']
     }
   )
   .then(documents => {
@@ -37,15 +37,13 @@ router.get('/', function(req, res, next) {
   });
 
   router.get('/show/:documentId', function(req, res, next) {
-    debugger
     model.DocumentModel.findById(
       req.params.documentId,
       { 
-        include: ['employee', 'status', 'type'] 
+        include: ['employee', 'status', 'type', 'reimbursements', 'travel'] 
       }
     )
     .then(document => {
-      debugger
       res.render(
         'documents/show', 
         { 
