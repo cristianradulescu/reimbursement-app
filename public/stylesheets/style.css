@@ -13,3 +13,11 @@ body {
 .table .showpage-container-row th {
   width: 130px;
 }
+
+.table .showpage-table-embedded {
+  font-size: .700rem;
+}
+
+table.table-striped table.showpage-table-embedded tbody tr:nth-of-type(odd) {
+  background-color: #fff;
+}

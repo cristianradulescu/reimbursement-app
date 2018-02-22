@@ -36,6 +36,12 @@ var DocumentModel = db.define(
         });
         
         return totalAmount.toFixed(2);
+      },
+      isTravel() {
+        return this.type_id == DocumentTypeModel.travelTypeId;
+      },
+      isReimbursement() {
+        return this.type_id == DocumentTypeModel.reimbursementTypeId;
       }
     }
   }
@@ -66,6 +72,8 @@ var DocumentTypeModel = db.define(
     timestamps: false
   }
 );
+DocumentTypeModel.travelTypeId = 1;
+DocumentTypeModel.reimbursementTypeId = 2;
 
 var DocumentStatusModel = db.define(
   'document_status', 
@@ -182,13 +190,13 @@ var TravelModel = db.define(
   }
 );
 
-DocumentModel.belongsTo(EmployeeModel, {as: 'employee'});
+DocumentModel.belongsTo(EmployeeModel, {foreign_key: 'employee_id', as: 'employee'});
 DocumentModel.belongsTo(DocumentStatusModel, {foreignKey: 'status_id', as: 'status'});
 DocumentModel.belongsTo(DocumentTypeModel, {foreignKey: 'type_id', as: 'type'});
-ReimbursementModel.belongsTo(ReimbursementTypeModel, {foreignKey: 'type_id', as: 'type'});
-ReimbursementModel.belongsTo(EmployeeModel, {foreignKey: 'type_id', as: 'employee'});
 DocumentModel.hasMany(ReimbursementModel, {foreignKey: 'document_id', as: 'reimbursements'});
 DocumentModel.hasOne(TravelModel, {foreignKey: 'document_id', as: 'travel'});
+ReimbursementModel.belongsTo(ReimbursementTypeModel, {foreignKey: 'type_id', as: 'type'});
+ReimbursementModel.belongsTo(EmployeeModel, {foreignKey: 'employee_id', as: 'employee'});
 
 module.exports = { 
   travelAllowance,

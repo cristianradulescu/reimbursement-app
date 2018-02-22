@@ -50,7 +50,7 @@ router.get('/show/:documentId', function(req, res, next) {
   model.DocumentModel.findById(
     req.params.documentId,
     { 
-      include: ['employee', 'status', 'type', 'reimbursements', 'travel'] 
+      include: [{ all: true, nested: true }]
     }
   )
   .then(document => {
