@@ -17,7 +17,7 @@ var authenticate = () => {
 var define = (modelName, attributes, options = {}) => {
   var defaultOptions = {
     freezeTableName: true,
-    timestamps: false, 
+    timestamps: true, 
     underscored: true
   };
 

@@ -69,7 +69,10 @@ var DocumentTypeModel = db.define(
     }
   },
   {
-    timestamps: false
+    timestamps: false,
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
   }
 );
 DocumentTypeModel.travelTypeId = 1;
@@ -86,6 +89,9 @@ var DocumentStatusModel = db.define(
     timestamps: false
   }
 );
+DocumentStatusModel.newStatusId = 1;
+DocumentStatusModel.pendingStatusId = 2;
+DocumentStatusModel.completedStatusId = 3;
 
 var EmployeeModel = db.define(
   'employee', 
@@ -102,6 +108,15 @@ var EmployeeModel = db.define(
     identity_card_number: {
       type: Sequelize.INTEGER
     },
+    job_title_id: {
+      type: Sequelize.INTEGER
+    },
+    division_manager_id: {
+      type: Sequelize.INTEGER
+    },
+    company_id: {
+      type: Sequelize.INTEGER
+    },
     created_at: {
       type: Sequelize.DATE
     },
@@ -110,11 +125,52 @@ var EmployeeModel = db.define(
     }
   },
   {
+    defaultScope: {
+      order: [['last_name', 'ASC'], ['first_name', 'ASC']]
+    },
     getterMethods: {
       fullName() {
         return `${this.last_name} ${this.first_name}`; 
       }
     }
+  }
+);
+
+var CompanyModel = db.define(
+  'company',
+  {
+    name: {
+      type: Sequelize.STRING
+    },
+    cost_center: {
+      type: Sequelize.STRING
+    },
+    created_at: {
+      type: Sequelize.DATE
+    },
+    updated_at: {
+      type: Sequelize.DATE
+    }
+  },
+  {
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
+  }
+);
+
+var EmployeeJobTitleModel = db.define(
+  'employee_job_title',
+  {
+    name: {
+      type: Sequelize.STRING
+    }
+  },
+  {
+    timestamps: false,
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
   }
 );
 
@@ -150,7 +206,10 @@ var ReimbursementTypeModel = db.define(
     }
   },
   {
-    timestamps: false
+    timestamps: false,
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
   }
 );
 
@@ -190,6 +249,36 @@ var TravelModel = db.define(
   }
 );
 
+var TravelPurposeModel = db.define(
+  'travel_purpose',
+  {
+    name: {
+      type: Sequelize.STRING
+    }
+  },
+  {
+    timestamps: false,
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
+  }
+);
+
+var TravelDestinationModel = db.define(
+  'travel_destination',
+  {
+    name: {
+      type: Sequelize.STRING
+    }
+  },
+  {
+    timestamps: false,
+    defaultScope: {
+      order: [[ 'name', 'ASC' ]]
+    },
+  }
+);
+
 DocumentModel.belongsTo(EmployeeModel, {foreign_key: 'employee_id', as: 'employee'});
 DocumentModel.belongsTo(DocumentStatusModel, {foreignKey: 'status_id', as: 'status'});
 DocumentModel.belongsTo(DocumentTypeModel, {foreignKey: 'type_id', as: 'type'});
@@ -197,13 +286,22 @@ DocumentModel.hasMany(ReimbursementModel, {foreignKey: 'document_id', as: 'reimb
 DocumentModel.hasOne(TravelModel, {foreignKey: 'document_id', as: 'travel'});
 ReimbursementModel.belongsTo(ReimbursementTypeModel, {foreignKey: 'type_id', as: 'type'});
 ReimbursementModel.belongsTo(EmployeeModel, {foreignKey: 'employee_id', as: 'employee'});
+TravelModel.belongsTo(TravelPurposeModel, {foreignKey: 'purpose_id', as: 'purpose'});
+TravelModel.belongsTo(TravelDestinationModel, {foreignKey: 'destination_id', as: 'destination'});
+EmployeeModel.belongsTo(EmployeeJobTitleModel, {foreignKey: 'job_title_id', as: 'jobTitle'});
+EmployeeModel.belongsTo(CompanyModel, {foreignKey: 'company_id', as: 'company'});
 
 module.exports = { 
   travelAllowance,
   DocumentModel,
   DocumentTypeModel,
   DocumentStatusModel,
-  EmployeeModel,
   ReimbursementModel,
-  ReimbursementTypeModel
+  ReimbursementTypeModel,
+  TravelModel,
+  TravelPurposeModel,
+  TravelDestinationModel,
+  EmployeeModel,
+  EmployeeJobTitleModel,
+  CompanyModel
 };

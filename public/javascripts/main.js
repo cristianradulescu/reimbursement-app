@@ -9,6 +9,7 @@ jQuery(document).ready(() => {
   });
 
   toggleNewDocumentDetails(documentTypeSelect);
+  syncTravelDates();
 });
 
 /**
@@ -41,5 +42,22 @@ function enableDocumentDetailsValidation(documentType, required = true) {
   jQuery('input[name^="'+documentType+'["]').each((key, value) => {
     jQuery(value).prop("required", required); 
     console.log(jQuery(value).prop("required"));
+  });
+}
+
+/**
+ * Autofill leave/arrival times based on the travel period. 
+ */
+function syncTravelDates()
+{
+  jQuery('#travelDateStartInput').on('change', function() {
+    jQuery('#travelDateEndInput').val(jQuery(this).val()).trigger('change');
+    jQuery('#travelDepartureLeaveTimeInput').val(jQuery(this).val()+'T06:00');
+    jQuery('#travelDestinationArrivalTimeInput').val(jQuery(this).val()+'T09:00');
+  });
+
+  jQuery('#travelDateEndInput').on('change', function() {
+    jQuery('#travelDestinationLeaveTimeInput').val(jQuery(this).val()+'T18:00');
+    jQuery('#travelDepartureArrivalTimeInput').val(jQuery(this).val()+'T21:00');
   });
 }

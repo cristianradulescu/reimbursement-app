@@ -15,7 +15,7 @@
       <label for="employeeSelect" class="col-md-2 col-form-label">Employee</label>
       <div class="col-md-4">
         <select class="form-control form-control-sm" id="employeeSelect" name="document[employee_id]" required="required">
-          {{#each employees}}
+          {{#each formData.employees}}
             <option value="{{this.id}}">{{this.fullName}}</option>
           {{/each}}
         </select>
@@ -25,7 +25,7 @@
       <label for="documentTypeSelect" class="col-md-2 col-form-label">Type</label>
       <div class="col-md-4">
         <select class="form-control form-control-sm" id="documentTypeSelect" name="document[type_id]" required="required">
-          {{#each documentTypes}}
+          {{#each formData.documentTypes}}
             <option value="{{this.id}}">{{this.name}}</option>
           {{/each}}
         </select>
@@ -42,7 +42,9 @@
         <label for="travelPurposeSelect" class="col-md-2 col-form-label">Purpose</label>
         <div class="col-md-4">
           <select class="form-control form-control-sm" id="travelPurposeSelect" name="travel[purpose_id]" required="required">
-              <option value="1">Sedinta</option>
+            {{#each formData.travelPurposes}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
           </select>
         </div>
       </div>
@@ -50,7 +52,9 @@
         <label for="travelDestinationSelect" class="col-md-2 col-form-label">Destination</label>
         <div class="col-md-4">
           <select class="form-control form-control-sm" id="travelDestinationSelect" name="travel[destination_id]" required="required">
-              <option value="1">Sedinta</option>
+            {{#each formData.travelDestinations}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
           </select>
         </div>
       </div>
@@ -79,9 +83,9 @@
         </div>
       </div>
       <div class="form-group row">
-        <label for="travelDestinationeLeaveTimeInput" class="col-md-2 col-form-label">Destination leave</label>
+        <label for="travelDestinationLeaveTimeInput" class="col-md-2 col-form-label">Destination leave</label>
         <div class="col-md-4">
-          <input type="datetime-local" class="form-control form-control-sm" id="travelDestinationeLeaveTimeInput" name="travel[destination_leave_time]" required="required" />
+          <input type="datetime-local" class="form-control form-control-sm" id="travelDestinationLeaveTimeInput" name="travel[destination_leave_time]" required="required" />
         </div>
       </div>
       <div class="form-group row">
@@ -102,7 +106,9 @@
         <label for="reimbursementTypeSelect" class="col-md-2 col-form-label">Type</label>
         <div class="col-md-4">
           <select class="form-control form-control-sm" id="reimbursementTypeSelect" name="reimbursement[0][purpose_id]" required="required">
-              <option value="1">Bon combustibil</option>
+            {{#each formData.reimbursementTypes}}
+            <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
           </select>
         </div>
       </div>
