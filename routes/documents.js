@@ -133,22 +133,34 @@ var createNewTravelDocument = (document, params, transaction) => {
   )
 };
 
-var createNewReimbursementDocument = (document, params) => {
-
+var createNewReimbursementDocument = (document, params, transaction) => {
+  return model.ReimbursementModel.create(
+    {
+      'employee_id': document.employee_id,
+      'type_id': params['type_id'],
+      'number': params['number'],
+      'date': params['date'],
+      'value': params['value'],
+    },
+    {
+      transaction: transaction
+    }
+  );
 };
 
-router.get('/new', function(req, res, next) {  
+router.get('/create', function(req, res, next) {  
   getNewDocumentFormData().then(formData => {
     res.render(
-      'documents/new', 
+      'documents/create', 
       { 
         title: 'Reimbursement | Create new document',
         formData
       }
     );
   });
-})
-.post('/new', function(req, res, next) {
+});
+
+router.post('/create', function(req, res, next) {
   var params = req.body;
 
   db.connection.transaction(createDocumentTransaction => {
@@ -166,7 +178,16 @@ router.get('/new', function(req, res, next) {
       
           case model.DocumentTypeModel.reimbursementTypeId:
             console.log('Creating a new Reimbursement document');
-            return createNewReimbursementDocument(document, params['reimbursement']);
+            return new Promise((resolve, reject) => {
+              params['reimbursement'].forEach(reimbursementParams => {
+                console.log(reimbursementParams);
+                createNewReimbursementDocument(document, reimbursementParams, createDocumentTransaction)
+                  .then(reimbursement => {
+                    document.addReimbursement(reimbursement);
+                  });
+              });
+              resolve(document.id);
+            });
         
           default: 
             throw 'Invalid document type';
@@ -174,7 +195,7 @@ router.get('/new', function(req, res, next) {
       });
   }).then(result => {
     console.log('Transaction has been committed');
-    console.log('message_success', 'Added new document #'+result);
+    console.log('Added new document #'+result);
     res.redirect('/documents');
 
     // result is whatever the result of the promise chain returned to the transaction callback
