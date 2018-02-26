@@ -68,18 +68,18 @@
             <thead>
               <th>Employee</th>
               <th>Type</th>
+              <th>Value</th>
               <th>Date</th>
               <th>Number</th>
-              <th>Value</th>
             </thead>
             <tbody>
               {{#each document.reimbursements}}
               <tr>
                 <td>{{this.employee.fullName}}</td>
                 <td>{{this.type.name}}</td>
+                <td>{{this.value}}</td>
                 <td>{{formatDate this.date "%d %b %Y"}}</td>
                 <td>{{this.number}}</td>
-                <td>{{this.value}}</td>
               </tr>
               {{/each}}
             </tbody>
