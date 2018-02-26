@@ -1,0 +1,36 @@
+<table class="table table-sm">
+  <tbody>
+    <tr class="showpage-container-row">
+      <td scope="row" colspan="2">
+        <p><strong>Reimbursements</strong></p>
+        <table class="table table-sm table-bordered showpage-table-embedded">
+          <thead>
+            <th>Employee</th>
+            <th>Type</th>
+            <th>Value</th>
+            <th>Number / Date</th>
+            <th>Actions</th>
+          </thead>
+          <tbody>
+            {{#each reimbursements}}
+            <tr>
+              <td>{{employee.fullName}}</td>
+              <td>{{type.name}}</td>
+              <td>{{value}}</td>
+              <td><small>{{number}} / {{formatDate this.date "%d-%m-%Y"}}</small></td>
+              <td>
+                <a class="link" href="#" title="Edit">
+                  Edit
+                </a> | 
+                <a class="link" href="#" title="Move to another document">
+                  Move
+                </a>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>

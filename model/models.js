@@ -290,6 +290,7 @@ TravelModel.belongsTo(TravelPurposeModel, {foreignKey: 'purpose_id', as: 'purpos
 TravelModel.belongsTo(TravelDestinationModel, {foreignKey: 'destination_id', as: 'destination'});
 EmployeeModel.belongsTo(EmployeeJobTitleModel, {foreignKey: 'job_title_id', as: 'jobTitle'});
 EmployeeModel.belongsTo(CompanyModel, {foreignKey: 'company_id', as: 'company'});
+EmployeeModel.hasMany(DocumentModel, {foreignKey: 'employee_id', as: 'documents'})
 
 module.exports = { 
   travelAllowance,

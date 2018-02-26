@@ -56,6 +56,9 @@ router.get('/show/:documentId', function(req, res, next) {
     }
   )
   .then(document => {
+    if (document == undefined) {
+      throw Error(`Document with id #${req.params.documentId} was not found.`);
+    }
     res.render(
       'documents/show', 
       { 
@@ -63,38 +66,57 @@ router.get('/show/:documentId', function(req, res, next) {
         document: document
       }
     );
+  }).catch(err => {
+    res.render(
+      'error',
+      {
+        'message': 'Unable to display the requested document',
+        'error': err
+      }
+    );
   })
 });
 
-var getNewDocumentFormData = () => {
+var getDocumentFormData = (document = undefined) => {
   var formData = {};
   return model.EmployeeModel
     .findAll(
       { 
         attributes: ['id', 'last_name', 'first_name'],
-        order: [['last_name', 'ASC'], ['first_name', 'ASC']] 
+        order: [['last_name', 'ASC'], ['first_name', 'ASC']]
       }
     )
     .then(employees => {
+      employees.forEach(element => {
+        element.isDefaultValue = document && (document.employee_id == element.id) ? true : false;
+      });
       formData.employees = employees;
       return model.DocumentTypeModel
         .findAll()
         .then(documentTypes => {
           formData.documentTypes = documentTypes;
-          return model.ReimbursementTypeModel
+          return model.DocumentStatusModel
             .findAll()
-            .then(reimbursementTypes => {
-              formData.reimbursementTypes = reimbursementTypes;
-              return model.TravelPurposeModel
+            .then(documentStatuses => {
+              documentStatuses.forEach(element => {
+                element.isDefaultValue = document && (document.status_id == element.id) ? true : false;
+              });
+              formData.documentStatuses = documentStatuses;
+              return model.ReimbursementTypeModel
                 .findAll()
-                .then(travelPurposes => {
-                  formData.travelPurposes = travelPurposes;
-                  return model.TravelDestinationModel
+                .then(reimbursementTypes => {
+                  formData.reimbursementTypes = reimbursementTypes;
+                  return model.TravelPurposeModel
                     .findAll()
-                    .then(travelDestinations => {
-                      formData.travelDestinations = travelDestinations;
-                      return formData;
-                    })
+                    .then(travelPurposes => {
+                      formData.travelPurposes = travelPurposes;
+                      return model.TravelDestinationModel
+                        .findAll()
+                        .then(travelDestinations => {
+                          formData.travelDestinations = travelDestinations;
+                          return formData;
+                        })
+                    });
                 });
             });
         });
@@ -109,7 +131,7 @@ var createNewDocument = (params, transaction) => {
       'type_id': params['type_id']
     },
     {
-      transaction: transaction
+      transaction
     }
   );
 };
@@ -128,7 +150,7 @@ var createNewTravelDocument = (document, params, transaction) => {
       'departure_arrival_time': params['departure_arrival_time']
     },
     {
-      transaction: transaction
+      transaction
     }
   )
 };
@@ -143,13 +165,29 @@ var createNewReimbursementDocument = (document, params, transaction) => {
       'value': params['value'],
     },
     {
-      transaction: transaction
+      transaction
     }
   );
 };
 
+var getDocumentById = documentId => {
+  return model.DocumentModel.findById(
+    documentId,
+    { 
+      include: [{ all: true, nested: true }]
+    }
+  )
+  .then(document => {
+    if (document == undefined) {
+      throw Error(`Document with id #${documentId} was not found.`);
+    }
+
+    return document;
+  });
+}
+
 router.get('/create', function(req, res, next) {  
-  getNewDocumentFormData().then(formData => {
+  getDocumentFormData().then(formData => {
     res.render(
       'documents/create', 
       { 
@@ -211,6 +249,72 @@ router.post('/create', function(req, res, next) {
       }
     );
   });
+});
+
+router.get('/edit/:documentId', function(req, res, next) {
+  getDocumentById(req.params.documentId)
+    .then(document => {
+      getDocumentFormData(document)
+        .then(formData => {
+          res.render(
+            'documents/edit', 
+            { 
+              title: `Reimbursement | Edit document #${document.id}`,
+              document,
+              formData
+            }
+          );
+        });
+      })
+      .catch(err => {
+        res.render(
+          'error',
+          {
+            'message': 'Unable to edit the requested document',
+            'error': err
+          }
+        );
+      });
+});
+
+router.post('/edit/:documentId', function(req, res, next) {
+  var params = req.body;
+
+  db.connection.transaction(editDocumentTransaction => {
+    getDocumentById(req.params.documentId)
+      .then(document => {
+        return document.update(
+          {
+            'employee_id': params['document']['employee_id'],
+            'status_id': params['document']['status_id']
+          },
+          {
+            editDocumentTransaction
+          }
+        )
+        .then(document => {
+          return document.id
+        });
+      })
+      .then(result => {
+        console.log('Transaction has been committed');
+        console.log('Updated document #'+result);
+        res.redirect('/documents');
+
+        // result is whatever the result of the promise chain returned to the transaction callback
+      }).catch(err => {
+        console.log('Transaction has been rolled back');
+        // err is whatever rejected the promise chain returned to the transaction callback
+
+        res.render(
+          'error',
+          {
+            'message': 'Transaction has been rolled back',
+            'error': err
+          }
+        );
+      });
+    });
 });
 
 module.exports = router;

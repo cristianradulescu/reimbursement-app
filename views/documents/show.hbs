@@ -6,7 +6,7 @@
     <span data-feather="edit"></span>
   </a>
   {{#if document.isReimbursement }}
-  <a class="btn btn-secondary" href="/documents/new" title="Add new reimbursement on document">
+  <a class="btn btn-secondary" href="#" title="Add new reimbursement on document">
     <span data-feather="plus"></span><span data-feather="dollar-sign"></span>
   </a>
   {{/if}}
@@ -34,61 +34,6 @@
       <th scope="row">Total</th>
       <td>{{document.totalAmount}}</td>
     </tr>
-
-    <!-- Travel -->
-    {{#if document.isTravel}}
-      <tr class="showpage-container-row">
-        <th scope="row">Period</th>
-        <td>
-          {{formatDate document.travel.date_start "%d %b %Y"}} - {{formatDate document.travel.date_end "%d %b %Y"}}
-        </td>
-      </tr>
-      <tr class="showpage-container-row">
-        <th scope="row">Departure times</th>
-        <td>
-          {{formatDate document.travel.departure_leave_time "%d %b %Y, %R"}} - {{formatDate document.travel.destination_arrival_time "%d %b %Y, %R"}}
-        </td>
-      </tr>
-      <tr class="showpage-container-row">
-        <th scope="row">Return times</th>
-        <td>
-          {{formatDate document.travel.destination_leave_time "%d %b %Y, %R"}} - {{formatDate document.travel.departure_arrival_time "%d %b %Y, %R"}}
-        </td>
-      </tr>
-
-    {{/if}}
-    <!-- /Travel -->
-
-    <!-- Reimbursement -->
-    {{#if document.isReimbursement}}
-      <tr class="showpage-container-row">
-        <td scope="row" colspan="2">
-          <p><strong>Reimbursements</strong></p>
-          <table class="table table-sm table-bordered showpage-table-embedded">
-            <thead>
-              <th>Employee</th>
-              <th>Type</th>
-              <th>Value</th>
-              <th>Date</th>
-              <th>Number</th>
-            </thead>
-            <tbody>
-              {{#each document.reimbursements}}
-              <tr>
-                <td>{{this.employee.fullName}}</td>
-                <td>{{this.type.name}}</td>
-                <td>{{this.value}}</td>
-                <td>{{formatDate this.date "%d %b %Y"}}</td>
-                <td>{{this.number}}</td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    {{/if}}
-    <!-- /Reimbursement -->
-
     <tr class="showpage-container-row">
       <th scope="row">Created</th>
       <td>{{formatDate document.created_at "%d %b %Y, %T"}}</td>
@@ -98,4 +43,16 @@
       <td>{{formatDate document.updated_at "%d %b %Y, %T"}}</td>
     </tr>
   </tbody>
-  </table>
+</table>
+
+<!-- Travel -->
+{{#if document.isTravel}}
+  {{> embedded_list_travel travel=document.travel}}
+{{/if}}
+<!-- /Travel -->
+
+<!-- Reimbursement -->
+{{#if document.isReimbursement}}
+  {{> embedded_list_reimbursements reimbursements=document.reimbursements}}
+{{/if}}
+<!-- /Reimbursement -->
