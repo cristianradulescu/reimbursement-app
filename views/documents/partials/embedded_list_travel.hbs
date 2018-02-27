@@ -1,0 +1,22 @@
+<table class="table table-sm">
+  <tbody>
+    <tr class="showpage-container-row">
+      <th scope="row">Period</th>
+      <td>
+        {{formatDate travel.date_start "%d %b %Y"}} - {{formatDate travel.date_end "%d %b %Y"}}
+      </td>
+    </tr>
+    <tr class="showpage-container-row">
+      <th scope="row">Departure times</th>
+      <td>
+        {{formatDate travel.departure_leave_time "%d %b %Y, %R"}} - {{formatDate travel.destination_arrival_time "%d %b %Y, %R"}}
+      </td>
+    </tr>
+    <tr class="showpage-container-row">
+      <th scope="row">Return times</th>
+      <td>
+        {{formatDate travel.destination_leave_time "%d %b %Y, %R"}} - {{formatDate travel.departure_arrival_time "%d %b %Y, %R"}}
+      </td>
+    </tr>
+  </tbody>
+</table>
