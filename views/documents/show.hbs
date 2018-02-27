@@ -14,14 +14,8 @@
 <hr />
 <table class="table table-sm table-striped">
   <tbody>
-    <tr class="showpage-container-row">
-      <th scope="row">ID</th>
-      <td>{{document.id}}</td>
-    </tr>
-    <tr class="showpage-container-row">
-      <th scope="row">Employee</th>
-      <td>{{document.employee.fullName}}</td>
-    </tr>
+    {{> showpage_container_row key="ID" value=document.id}}
+    {{> showpage_container_row key="Employee" value=document.employee.fullName}}
     <tr class="showpage-container-row">
       <th scope="row">Status</th>
       <td>{{> document_status_badge status_id=document.status_id status=document.status.name }}</td>
@@ -30,18 +24,9 @@
       <th scope="row">Type</th>
       <td>{{> document_type_icon type_id=document.type_id }} {{document.type.name}}</td>
     </tr>
-    <tr class="showpage-container-row">
-      <th scope="row">Total</th>
-      <td>{{document.totalAmount}}</td>
-    </tr>
-    <tr class="showpage-container-row">
-      <th scope="row">Created</th>
-      <td>{{formatDate document.created_at "%d %b %Y, %T"}}</td>
-    </tr>
-    <tr class="showpage-container-row">
-      <th scope="row">Updated</th>
-      <td>{{formatDate document.updated_at "%d %b %Y, %T"}}</td>
-    </tr>
+    {{> showpage_container_row key="Total" value=document.totalAmount}}
+    {{> showpage_container_row key="Created" value=(formatDate document.created_at "%d %b %Y, %T")}}
+    {{> showpage_container_row key="Updated" value=(formatDate document.updated_at "%d %b %Y, %T")}}
   </tbody>
 </table>
 
@@ -55,4 +40,4 @@
 {{#if document.isReimbursement}}
   {{> embedded_list_reimbursements reimbursements=document.reimbursements}}
 {{/if}}
-<!-- /Reimbursement -->
+<!-- /Reimbursement -->`

@@ -4,7 +4,6 @@ var hbs = require('hbs');
 var db = require('../db');
 var model = require('../model/models.js');
 
-
 hbs.registerHelper('documentStatusBadge', (status_id) => {
   if (status_id == 1) {
     return 'danger';

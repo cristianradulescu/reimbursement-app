@@ -19,23 +19,21 @@
     {{#each documents}}
     <tr>
       <th scope="row">
-        <a href="/documents/show/{{this.id}}">
-         {{this.id}}
-         </a>
+        <a href="/documents/show/{{id}}">{{id}}</a>
       </th>
-      <td>{{this.employee.fullName}}</td>
-      <td>{{> document_status_badge status_id=this.status_id status=this.status.name }}</td>
-      <td>{{> document_type_icon type_id=this.type_id }}</td>
-      <td class="text-right">{{this.totalAmount}}</td>
+      <td>{{employee.fullName}}</td>
+      <td>{{> document_status_badge status_id=status_id status=status.name }}</td>
+      <td>{{> document_type_icon type_id=type_id }}</td>
+      <td class="text-right">{{totalAmount}}</td>
       <td>
         <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
-          <a class="btn btn-secondary" href="/documents/print/{{this.id}}">
+          <a class="btn btn-secondary" href="/documents/print/{{id}}">
             <span data-feather="printer"></span>
           </a>
-          <a class="btn btn-secondary" href="/documents/show/{{this.id}}">
+          <a class="btn btn-secondary" href="/documents/show/{{id}}">
               <span data-feather="eye"></span>
           </a>
-          <a class="btn btn-secondary" href="/documents/edit/{{this.id}}">
+          <a class="btn btn-secondary" href="/documents/edit/{{id}}">
             <span data-feather="edit"></span>
           </a>
         </div>

@@ -16,7 +16,7 @@
       <div class="col-md-4">
         <select class="form-control form-control-sm" id="employeeSelect" name="document[employee_id]" required="required">
           {{#each formData.employees}}
-            <option value="{{this.id}}">{{this.fullName}}</option>
+            <option value="{{id}}">{{fullName}}</option>
           {{/each}}
         </select>
       </div>
@@ -26,7 +26,7 @@
       <div class="col-md-4">
         <select class="form-control form-control-sm" id="documentTypeSelect" name="document[type_id]" required="required">
           {{#each formData.documentTypes}}
-            <option value="{{this.id}}">{{this.name}}</option>
+            <option value="{{id}}">{{name}}</option>
           {{/each}}
         </select>
         <small id="documentTypeSelectHelp" class="form-text text-muted">Select document type to get more details.</small>
