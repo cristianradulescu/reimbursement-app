@@ -131,6 +131,10 @@ var EmployeeModel = db.define(
     getterMethods: {
       fullName() {
         return `${this.last_name} ${this.first_name}`; 
+      },
+      // convenient alternative to full name
+      name() {
+        return this.fullName;
       }
     }
   }

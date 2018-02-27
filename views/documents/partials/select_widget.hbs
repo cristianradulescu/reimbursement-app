@@ -1,0 +1,5 @@
+<select class="form-control form-control-sm" id="{{widgetId}}" name="{{widgetName}}" {{#if required}}required="required"{{/if}}>
+  {{#each optionsLoop}}
+    <option value="{{id}}" {{#if isDefaultValue}}selected="selected"{{/if}}>{{name}}</option>
+  {{/each}}
+</select>

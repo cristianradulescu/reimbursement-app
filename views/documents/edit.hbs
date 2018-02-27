@@ -23,21 +23,13 @@
     <div class="form-group row">
       <label for="employeeSelect" class="col-md-2 col-form-label">Employee</label>
       <div class="col-md-4">
-        <select class="form-control form-control-sm" id="employeeSelect" name="document[employee_id]" required="required">
-          {{#each formData.employees}}
-            <option value="{{id}}" {{#if isDefaultValue}}selected="selected"{{/if}}>{{fullName}}</option>
-          {{/each}}
-        </select>
+        {{> select_widget widgetId="employeeSelect" widgetName="document[employee_id]" optionsLoop=formData.employees required=true}}
       </div>
     </div>
     <div class="form-group row">
       <label for="documentStatusSelect" class="col-md-2 col-form-label">Status</label>
       <div class="col-md-4">
-        <select class="form-control form-control-sm" id="documentStatusSelect" name="document[status_id]" required="required">
-          {{#each formData.documentStatuses}}
-            <option value="{{id}}" {{#if isDefaultValue}}selected="selected"{{/if}}>{{name}}</option>
-          {{/each}}
-        </select>
+        {{> select_widget widgetId="documentStatusSelect" widgetName="document[status_id]" optionsLoop=formData.documentStatuses required=true}}
       </div>
     </div>
     <div class="form-group row">
@@ -47,13 +39,64 @@
       </div>
     </div>
   </fieldset>
-</form>
 
-<!-- Travel -->
-{{#if document.isTravel}}
-  {{> embedded_list_travel travel=document.travel}}
-{{/if}}
-<!-- /Travel -->
+  <!-- Travel -->
+  <fieldset class="form-group">
+    <legend class="h6">Travel details</legend>
+    <div class="form-group row">
+      <label for="travelPurposeSelect" class="col-md-2 col-form-label">Purpose</label>
+      <div class="col-md-4">
+        {{> select_widget widgetId="travelPurposeSelect" widgetName="travel[purpose_id]" optionsLoop=formData.travelPurposes required=true}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDestinationSelect" class="col-md-2 col-form-label">Destination</label>
+      <div class="col-md-4">
+        {{> select_widget widgetId="travelDestinationSelect" widgetName="travel[destination_id]" optionsLoop=formData.travelDestinations required=true}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDateStartInput" class="col-md-2 col-form-label">Date start</label>
+      <div class="col-md-4">
+        <input type="date" class="form-control form-control-sm" id="travelDateStartInput" 
+          name="travel[date_start]" required="required" value="{{document.travel.date_start}}" />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDateEndInput" class="col-md-2 col-form-label">Date end</label>
+      <div class="col-md-4">
+        <input type="date" class="form-control form-control-sm" id="travelDateEndInput" 
+          name="travel[date_end]" required="required"  value="{{document.travel.date_end}}" />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDepartureLeaveTimeInput" class="col-md-2 col-form-label">Departure leave</label>
+      <div class="col-md-4">
+        {{> datetime_local_widget widgetId="travelDepartureLeaveTimeInput" widgetName="travel[departure_leave_time]" widgetValue=document.travel.departure_leave_time required=true}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDestinationArrivalTimeInput" class="col-md-2 col-form-label">Destination arrival</label>
+      <div class="col-md-4">
+        {{> datetime_local_widget widgetId="travelDestinationArrivalTimeInput" widgetName="travel[destination_arrival_time]" widgetValue=document.travel.destination_arrival_time required=true}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDestinationLeaveTimeInput" class="col-md-2 col-form-label">Destination leave</label>
+      <div class="col-md-4">
+        {{> datetime_local_widget widgetId="travelDestinationLeaveTimeInput" widgetName="travel[destination_leave_time]" widgetValue=document.travel.destination_leave_time required=true}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="travelDepartureArrivalTimeInput" class="col-md-2 col-form-label">Departure arrival</label>
+      <div class="col-md-4">
+        {{> datetime_local_widget widgetId="travelDepartureArrivalTimeInput" widgetName="travel[departure_arrival_time]" widgetValue=document.travel.departure_arrival_time required=true}}
+      </div>
+    </div>
+  </fieldset>
+  <!-- /Travel -->
+
+</form>
 
 <!-- Reimbursement -->
 {{#if document.isReimbursement}}
