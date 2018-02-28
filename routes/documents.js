@@ -63,12 +63,12 @@ var getDocumentFormData = (document = undefined) => {
                 .findAll()
                 .then(reimbursementTypes => {
                   formData.reimbursementTypes = reimbursementTypes;
-
+              
                   return model.TravelPurposeModel
                     .findAll()
                     .then(travelPurposes => {
                       travelPurposes.forEach(element => {
-                        element.isDefaultValue = document && (document.travel.purpose_id == element.id);
+                        element.isDefaultValue = document && document.isTravel && (document.travel.purpose_id == element.id);
                       });
                       formData.travelPurposes = travelPurposes;
 
@@ -76,7 +76,7 @@ var getDocumentFormData = (document = undefined) => {
                         .findAll()
                         .then(travelDestinations => {
                           travelDestinations.forEach(element => {
-                            element.isDefaultValue = document && (document.travel.destination_id == element.id);
+                            element.isDefaultValue = document && document.isTravel && (document.travel.destination_id == element.id);
                           });
                           formData.travelDestinations = travelDestinations;
 
@@ -124,7 +124,7 @@ var createNewTravelDocument = (document, params, transaction) => {
 var createNewReimbursementDocument = (document, params, transaction) => {
   return model.ReimbursementModel.create(
     {
-      'employee_id': document.employee_id,
+      'employee_id': params['employee_id'],
       'type_id': params['type_id'],
       'number': params['number'],
       'date': params['date'],
@@ -325,7 +325,20 @@ router.post('/edit/:documentId', function(req, res, next) {
               return document.id;
             })
           } else if (document.isReimbursement) {
-            return document.id
+            document.reimbursements.forEach(reimbursement => {
+              var reimbursementParams = params.reimbursement[reimbursement.id];
+              reimbursement.update(
+                {
+                  'employee_id': reimbursementParams['employee_id'],
+                  'type_id': reimbursementParams['type_id'],
+                  'number': reimbursementParams['number'],
+                  'date': reimbursementParams['date'],
+                  'value': reimbursementParams['value'],
+                }
+              );
+            });
+
+            return document.id;
           }
 
           throw Error('Document type is invalid.');
