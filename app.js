@@ -9,6 +9,7 @@ var swag = require('swag');
 
 var index = require('./routes/index');
 var documents = require('./routes/documents');
+var reimbursements = require('./routes/reimbursements');
 var employees = require('./routes/employees');
 
 var app = express();
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'node_modules/feather-icons/')));
 
 app.use('/', index);
 app.use('/documents', documents);
+app.use('/reimbursements', reimbursements);
 app.use('/employees', employees);
 
 // catch 404 and forward to error handler

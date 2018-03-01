@@ -225,7 +225,7 @@ router.post('/create', function(req, res, next) {
             return createNewTravelDocument(document, params['travel'], createDocumentTransaction)
               .then(travel => {
                 document.setTravel(travel);
-                return document.id;
+                return document;
               });
       
           case model.DocumentTypeModel.reimbursementTypeId:
@@ -238,17 +238,17 @@ router.post('/create', function(req, res, next) {
                     document.addReimbursement(reimbursement);
                   });
               });
-              resolve(document.id);
+              resolve(document);
             });
         
           default: 
             throw 'Invalid document type';
         }
       });
-  }).then(result => {
+  }).then(document => {
     console.log('Transaction has been committed');
-    console.log('Added new document #'+result);
-    res.redirect('/documents');
+    console.log('Added new document #'+document.id);
+    res.redirect('/documents/show/'+document.id);
 
     // result is whatever the result of the promise chain returned to the transaction callback
   }).catch(err => {
@@ -322,7 +322,7 @@ router.post('/edit/:documentId', function(req, res, next) {
               }
             )
             .then(travel => {
-              return document.id;
+              return document;
             })
           } else if (document.isReimbursement) {
             document.reimbursements.forEach(reimbursement => {
@@ -338,16 +338,16 @@ router.post('/edit/:documentId', function(req, res, next) {
               );
             });
 
-            return document.id;
+            return document;
           }
 
           throw Error('Document type is invalid.');
         });
       })
-      .then(result => {
+      .then(document => {
         console.log('Transaction has been committed');
-        console.log('Updated document #'+result);
-        res.redirect('/documents');
+        console.log('Updated document #'+document.id);
+        res.redirect('/documents/show/'+document.id);
 
         // result is whatever the result of the promise chain returned to the transaction callback
       }).catch(err => {
