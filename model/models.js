@@ -25,9 +25,22 @@ var DocumentModel = db.define(
   },
   {
     getterMethods: {
+      travelPeriod() {
+        if (this.travel == undefined) {
+          throw 'Current document is not associated with a travel';
+        }
+        var date_start = luxon.DateTime.fromISO(this.travel.date_start);
+        var date_end = luxon.DateTime.fromISO(this.travel.date_end);
+      
+        // The period in days must be incremented to take into consideration also the first day
+        var period = date_end.diff(date_start, 'days').toObject();
+        period.days = period.days == undefined ? 1 : period.days + 1;
+      
+        return period;
+      },
       totalAmount() {
         if (this.travel) {
-          return (travelAllowance * this.getTravelPeriod().days).toFixed(2);
+          return (travelAllowance * this.travelPeriod.days).toFixed(2);
         }
 
         var totalAmount = 0;
@@ -43,23 +56,9 @@ var DocumentModel = db.define(
       isReimbursement() {
         return this.type_id == DocumentTypeModel.reimbursementTypeId;
       }
-    }
+    },
   }
 );
-
-DocumentModel.prototype.getTravelPeriod = function() {
-  if (this.travel == undefined) {
-    throw 'Current document is not associated with a travel';
-  }
-  var date_start = luxon.DateTime.fromISO(this.travel.date_start);
-  var date_end = luxon.DateTime.fromISO(this.travel.date_end);
-
-  // The period in days must be incremented to take into consideration also the first day
-  var travelPeriod = date_end.diff(date_start, 'days').toObject();
-  travelPeriod.days = travelPeriod.days == undefined ? 1 : travelPeriod.days + 1;
-
-  return travelPeriod;
-};
 
 var DocumentTypeModel = db.define(
   'document_type', 
