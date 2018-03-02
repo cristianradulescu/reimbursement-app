@@ -10,6 +10,9 @@ module.exports = function(sequelize, DataTypes) {
       cost_center: {
         type: Sequelize.STRING
       },
+      division_manager_id: {
+        type: Sequelize.INTEGER
+      },
       created_at: {
         type: Sequelize.DATE
       },

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const hbs = require('hbs');
+const moment = require('moment');
 const models = require('../models');
 const documentService = require('../services/documentService');
 
@@ -28,7 +29,7 @@ hbs.registerHelper('documentTypeIcon', (type_id) => {
   }
 });
 
-var getDocumentFormData = (document = undefined) => {
+let getDocumentFormData = (document = undefined) => {
   var formData = {};
   return models.Employee
     .findAll(
@@ -88,6 +89,55 @@ var getDocumentFormData = (document = undefined) => {
         });
     });
 };
+
+let printTravelDocument = (res, document) => {
+  res.render(
+    'documents/print/travel', 
+    { 
+      layout: false,
+      
+      PLACEHOLDER_COST_CENTER: document.employee.company.cost_center,
+      PLACEHOLDER_EMPLOYEE_NAME: document.employee.name,
+      PLACEHOLDER_EMPLOYEE_JOB_TITLE: document.employee.jobTitle.name,
+      PLACEHOLDER_TRAVEL_PURPOSE: document.travel.purpose.name,
+      PLACEHOLDER_TRAVEL_DESTINATION: document.travel.destination.name,
+      PLACEHOLDER_COMPANY_NAME: document.employee.company.name,
+      PLACEHOLDER_EMPLOYEE_ICN: document.employee.identity_card_number,
+      PLACEHOLDER_EMPLOYEE_PNC: document.employee.personal_numeric_code,
+      PLACEHOLDER_DATE_FROM: moment(document.travel.date_start).format('DD.MM.YYYY'),
+      PLACEHOLDER_DATE_TO: moment(document.travel.date_end).format('DD.MM.YYYY'),
+      PLACEHOLDER_DESTINATION_ARRIVAL_TIME: moment(document.travel.destination_arrival_time).format('DD.MM.YYYY HH:mm'),
+      PLACEHOLDER_DESTINATION_LEAVE_TIME: moment(document.travel.destination_leave_time).format('DD.MM.YYYY HH:mm'),
+      PLACEHOLDER_STARTPOINT_LEAVE_TIME: moment(document.travel.departure_leave_time).format('DD.MM.YYYY HH:mm'),
+      PLACEHOLDER_STARTPOINT_ARRIVAL_TIME: moment(document.travel.departure_arrival_time).format('DD.MM.YYYY HH:mm'),
+      PLACEHOLDER_MANAGER_LAST_NAME: document.employee.company.divisionManager.last_name,
+      PLACEHOLDER_MANAGER_FIRST_NAME: document.employee.company.divisionManager.first_name,
+      PLACEHOLDER_EMPLOYEE_LAST_NAME: document.employee.last_name,
+      PLACEHOLDER_EMPLOYEE_FIRST_NAME: document.employee.first_name,
+      PLACEHOLDER_TRAVEL_TOTAL_AMOUNT: document.travel.totalAmount,
+      PLACEHOLDER_DAYS_ON_TRAVEL: document.travel.period,
+      PLACEHOLDER_TRAVEL_ALLOWANCE: document.travel.travelAllowance
+    }
+  );
+}
+
+let printReimbursementDocument = (res, document) => {
+  res.render(
+    'documents/print/reimbursement', 
+    { 
+      layout: false,
+      
+      PLACEHOLDER_COST_CENTER: document.employee.company.cost_center,
+      PLACEHOLDER_COMPANY_NAME: document.employee.company.name,
+      PLACEHOLDER_EMPLOYEE_NAME: document.employee.name,
+      PLACEHOLDER_EMPLOYEE_JOB_TITLE: document.employee.jobTitle.name,
+      PLACEHOLDER_MANAGER_LAST_NAME: document.employee.company.divisionManager.last_name,
+      PLACEHOLDER_MANAGER_FIRST_NAME: document.employee.company.divisionManager.first_name,
+      PLACEHOLDER_REIMBURSEMENT_TOTAL_AMOUNT: document.totalAmount,
+      reimbursements: document.reimbursements
+    }
+  );
+}
 
 /* GET documents listing. */
 router.get('/', function(req, res, next) {
@@ -268,6 +318,25 @@ router.post('/edit/:documentId', function(req, res, next) {
         }
       );
     });
+});
+
+router.get('/print/:documentId', function(req, res, next) {
+  documentService.getDocumentById(req.params.documentId)
+  .then(document => {
+    if (document.isTravel) {
+      printTravelDocument(res, document);
+    } else if (document.isReimbursement) {
+      printReimbursementDocument(res, document);
+    }
+  }).catch(err => {
+    res.render(
+      'error',
+      {
+        'message': 'Unable to display the requested document',
+        'error': err
+      }
+    );
+  })
 });
 
 module.exports = router;

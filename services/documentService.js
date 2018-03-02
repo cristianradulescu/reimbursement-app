@@ -4,7 +4,30 @@ var getDocumentById = documentId => {
   return models.Document.findById(
     documentId,
     { 
-      include: [{ all: true, nested: true }]
+      include: [
+        { 
+          all: true, 
+          nested: true 
+        },
+        {
+          model: models.Employee, as: 'employee', include: [
+            {
+              all: true, 
+              nested: true 
+            },
+            { 
+              model: models.Company, 
+              as: 'company', 
+              include: [
+                { 
+                  model: models.Employee, 
+                  as: 'divisionManager' 
+                }
+              ] 
+            }
+          ]
+        }
+      ]
     }
   )
   .then(document => {

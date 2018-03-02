@@ -41,6 +41,8 @@ models.forEach(function(model) {
   m.Employee.belongsTo(m.Company, {foreignKey: 'company_id', as: 'company'});
   m.Employee.hasMany(m.Document, {foreignKey: 'employee_id', as: 'documents'});
 
+  m.Company.belongsTo(m.Employee, {foreignKey: 'division_manager_id', as: 'divisionManager'});
+
   m.Reimbursement.belongsTo(m.ReimbursementType, {foreignKey: 'type_id', as: 'type'});
   m.Reimbursement.belongsTo(m.Employee, {foreignKey: 'employee_id', as: 'employee'});
 
