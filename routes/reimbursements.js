@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const models = require('../models');
+const documentService = require('../services/documentService');
 
 var getDocumentFormData = () => {
   var formData = {};
@@ -36,24 +37,8 @@ var getDocumentFormData = () => {
     });
 };
 
-var getDocumentById = documentId => {
-  return models.Document.findById(
-    documentId,
-    { 
-      include: [{ all: true, nested: true }]
-    }
-  )
-  .then(document => {
-    if (document == undefined) {
-      throw Error(`Document with id #${documentId} was not found.`);
-    }
-
-    return document;
-  });
-}
-
 router.get('/create/:documentId', function(req, res, next) {
-  getDocumentById(req.params.documentId)
+  documentService.getDocumentById(req.params.documentId)
     .then(document => {
       if (document == undefined) {
         throw Error(`Document with id #${documentId} was not found.`);
@@ -86,44 +71,30 @@ router.post('/create/:documentId', function(req, res, next) {
   var params = req.body;
 
   models.sequelize.transaction(createReimbursementTransaction => {
-    return getDocumentById(req.params.documentId)
+    return documentService.getDocumentById(req.params.documentId)
       .then(document => {
         console.log('Creating a new Reimbursement document');
 
         return new Promise((resolve, reject) => {
-          params['reimbursement'].forEach(reimbursementParams => {
-            console.log(reimbursementParams);
+          params.reimbursement.forEach(reimbursementParams => {
 
-            return models.Reimbursement.create(
-              {
-                employee_id: reimbursementParams['employee_id'],
-                type_id: reimbursementParams['type_id'],
-                number: reimbursementParams['number'],
-                date: reimbursementParams['date'],
-                value: reimbursementParams['value'],
-              },
-              {
-                createReimbursementTransaction
-              }
-            )
-            .then(reimbursement => {
-              document.addReimbursement(reimbursement);
+            return documentService.createReimbursementDocument(document, reimbursementParams, createReimbursementTransaction)
+              .then(reimbursement => {
+                document.addReimbursement(reimbursement);
+              });
             });
-          });
 
           resolve(document);
         });
       });
-  }).then(document => {
+  })
+  .then(document => {
     console.log('Transaction has been committed');
     console.log('Added new reimbursement for document #'+document.id);
     res.redirect('/documents/show/'+document.id);
-
-    // result is whatever the result of the promise chain returned to the transaction callback
-  }).catch(err => {
+  })
+  .catch(err => {
     console.log('Transaction has been rolled back');
-    // err is whatever rejected the promise chain returned to the transaction callback
-
     res.render(
       'error',
       {

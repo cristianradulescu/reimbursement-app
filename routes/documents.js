@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const hbs = require('hbs');
 const models = require('../models');
+const documentService = require('../services/documentService');
 
 hbs.registerHelper('documentStatusBadge', (status_id) => {
   if (status_id === 1) {
@@ -88,69 +89,6 @@ var getDocumentFormData = (document = undefined) => {
     });
 };
 
-var createNewDocument = (params, transaction) => {
-  return models.Document.create(
-    {
-      employee_id: params['employee_id'],
-      status_id: models.DocumentStatus.build().newStatusId,
-      type_id: params['type_id']
-    },
-    {
-      transaction
-    }
-  );
-};
-
-var createNewTravelDocument = (document, params, transaction) => {
-  return models.Travel.create(
-    {
-      employee_id: document.employee_id,
-      purpose_id: params['purpose_id'],
-      destination_id: params['destination_id'],
-      date_start: params['date_start'],
-      date_end: params['date_end'],
-      departure_leave_time: params['departure_leave_time'],
-      destination_arrival_time: params['destination_arrival_time'],
-      destination_leave_time: params['destination_leave_time'],
-      departure_arrival_time: params['departure_arrival_time']
-    },
-    {
-      transaction
-    }
-  )
-};
-
-var createNewReimbursementDocument = (document, params, transaction) => {
-  return models.Reimbursement.create(
-    {
-      employee_id: params['employee_id'],
-      type_id: params['type_id'],
-      number: params['number'],
-      date: params['date'],
-      value: params['value'],
-    },
-    {
-      transaction
-    }
-  );
-};
-
-var getDocumentById = documentId => {
-  return models.Document.findById(
-    documentId,
-    { 
-      include: [{ all: true, nested: true }]
-    }
-  )
-  .then(document => {
-    if (document == undefined) {
-      throw Error(`Document with id #${documentId} was not found.`);
-    }
-
-    return document;
-  });
-}
-
 /* GET documents listing. */
 router.get('/', function(req, res, next) {
   models.Document.findAll(
@@ -171,32 +109,24 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/show/:documentId', function(req, res, next) {
-  models.Document.findById(
-    req.params.documentId,
-    { 
-      include: [{ all: true, nested: true }]
-    }
-  )
-  .then(document => {
-    if (document === undefined) {
-      throw Error(`Document with id #${req.params.documentId} was not found.`);
-    }
-    res.render(
-      'documents/show', 
-      { 
-        title: `Reimbursement | Show document #${document.id}`,
-        document: document
-      }
-    );
-  }).catch(err => {
-    res.render(
-      'error',
-      {
-        'message': 'Unable to display the requested document',
-        'error': err
-      }
-    );
-  })
+  documentService.getDocumentById(req.params.documentId)
+    .then(document => {
+      res.render(
+        'documents/show', 
+        { 
+          title: `Reimbursement | Show document #${document.id}`,
+          document: document
+        }
+      );
+    }).catch(err => {
+      res.render(
+        'error',
+        {
+          'message': 'Unable to display the requested document',
+          'error': err
+        }
+      );
+    })
 });
 
 router.get('/create', function(req, res, next) {  
@@ -215,13 +145,13 @@ router.post('/create', function(req, res, next) {
   var params = req.body;
 
   models.sequelize.transaction(createDocumentTransaction => {
-    return createNewDocument(params['document'], createDocumentTransaction)
+    return documentService.createDocument(params['document'], createDocumentTransaction)
       .then(document => {
 
         switch (parseInt(params['document']['type_id'])) {
           case models.DocumentType.build().travelTypeId:
             console.log('Creating a new Travel document');
-            return createNewTravelDocument(document, params['travel'], createDocumentTransaction)
+            return documentService.createTravelDocument(document, params['travel'], createDocumentTransaction)
               .then(travel => {
                 document.setTravel(travel);
                 return document;
@@ -232,7 +162,7 @@ router.post('/create', function(req, res, next) {
             return new Promise((resolve, reject) => {
               params['reimbursement'].forEach(reimbursementParams => {
                 console.log(reimbursementParams);
-                createNewReimbursementDocument(document, reimbursementParams, createDocumentTransaction)
+                documentService.createReimbursementDocument(document, reimbursementParams, createDocumentTransaction)
                   .then(reimbursement => {
                     document.addReimbursement(reimbursement);
                   });
@@ -244,16 +174,14 @@ router.post('/create', function(req, res, next) {
             throw 'Invalid document type';
         }
       });
-  }).then(document => {
+  })
+  .then(document => {
     console.log('Transaction has been committed');
     console.log('Added new document #'+document.id);
     res.redirect('/documents/show/'+document.id);
-
-    // result is whatever the result of the promise chain returned to the transaction callback
-  }).catch(err => {
+  })
+  .catch(err => {
     console.log('Transaction has been rolled back');
-    // err is whatever rejected the promise chain returned to the transaction callback
-
     res.render(
       'error',
       {
@@ -265,7 +193,7 @@ router.post('/create', function(req, res, next) {
 });
 
 router.get('/edit/:documentId', function(req, res, next) {
-  getDocumentById(req.params.documentId)
+  documentService.getDocumentById(req.params.documentId)
     .then(document => {
       getDocumentFormData(document)
         .then(formData => {
@@ -294,7 +222,7 @@ router.post('/edit/:documentId', function(req, res, next) {
   var params = req.body;
 
   models.sequelize.transaction(editDocumentTransaction => {
-    getDocumentById(req.params.documentId)
+    return documentService.getDocumentById(req.params.documentId)
       .then(document => {
         return document.update(
           {
@@ -307,60 +235,38 @@ router.post('/edit/:documentId', function(req, res, next) {
         )
         .then(document => {
           if (document.isTravel) {
-            return document.travel.update(
-              {
-                employee_id: document.employee_id,
-                purpose_id: params['travel']['purpose_id'],
-                destination_id: params['travel']['destination_id'],
-                date_start: params['travel']['date_start'],
-                date_end: params['travel']['date_end'],
-                departure_leave_time: params['travel']['departure_leave_time'],
-                destination_arrival_time: params['travel']['destination_arrival_time'],
-                destination_leave_time: params['travel']['destination_leave_time'],
-                departure_arrival_time: params['travel']['departure_arrival_time']
-              }
-            )
-            .then(travel => {
-              return document;
-            })
+            return documentService.updateTravelDocument(document.travel, params['travel'], editDocumentTransaction)
+              .then(travel => {
+                return document;
+              })
           } else if (document.isReimbursement) {
-            document.reimbursements.forEach(reimbursement => {
-              var reimbursementParams = params.reimbursement[reimbursement.id];
-              reimbursement.update(
-                {
-                  employee_id: reimbursementParams['employee_id'],
-                  type_id: reimbursementParams['type_id'],
-                  number: reimbursementParams['number'],
-                  date: reimbursementParams['date'],
-                  value: reimbursementParams['value'],
-                }
-              );
+            return new Promise((resolve, reject) => {
+              document.reimbursements.forEach(reimbursement => {
+                var reimbursementParams = params.reimbursement[reimbursement.id];
+                documentService.updateReimbursementDocument(reimbursement, reimbursementParams, editDocumentTransaction)
+              });
+              
+              resolve(document);
             });
-
-            return document;
           }
 
           throw Error('Document type is invalid.');
         });
-      })
-      .then(document => {
-        console.log('Transaction has been committed');
-        console.log('Updated document #'+document.id);
-        res.redirect('/documents/show/'+document.id);
-
-        // result is whatever the result of the promise chain returned to the transaction callback
-      }).catch(err => {
-        console.log('Transaction has been rolled back');
-        // err is whatever rejected the promise chain returned to the transaction callback
-
-        res.render(
-          'error',
-          {
-            'message': 'Transaction has been rolled back',
-            'error': err
-          }
-        );
       });
+    })
+    .then(document => {
+      console.log('Transaction has been committed');
+      console.log('Updated document #'+document.id);
+      res.redirect('/documents/show/'+document.id);
+    }).catch(err => {
+      console.log('Transaction has been rolled back');
+      res.render(
+        'error',
+        {
+          'message': 'Transaction has been rolled back',
+          'error': err
+        }
+      );
     });
 });
 
