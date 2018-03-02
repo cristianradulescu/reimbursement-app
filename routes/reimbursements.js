@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var db = require('../db');
-var model = require('../model/models.js');
+const models = require('../models');
 
 var getDocumentFormData = () => {
   var formData = {};
-  return model.EmployeeModel
+  return models.Employee
     .findAll(
       { 
         attributes: ['id', 'last_name', 'first_name'],
@@ -15,17 +14,17 @@ var getDocumentFormData = () => {
     .then(employees => {
       formData.employees = employees;
 
-      return model.DocumentTypeModel
+      return models.DocumentType
         .findAll()
         .then(documentTypes => {
           formData.documentTypes = documentTypes;
 
-          return model.DocumentStatusModel
+          return models.DocumentStatus
             .findAll()
             .then(documentStatuses => {
               formData.documentStatuses = documentStatuses;
 
-              return model.ReimbursementTypeModel
+              return models.ReimbursementType
                 .findAll()
                 .then(reimbursementTypes => {
                   formData.reimbursementTypes = reimbursementTypes;
@@ -38,7 +37,7 @@ var getDocumentFormData = () => {
 };
 
 var getDocumentById = documentId => {
-  return model.DocumentModel.findById(
+  return models.Document.findById(
     documentId,
     { 
       include: [{ all: true, nested: true }]
@@ -54,7 +53,7 @@ var getDocumentById = documentId => {
 }
 
 router.get('/create/:documentId', function(req, res, next) {
-  return getDocumentById(req.params.documentId)
+  getDocumentById(req.params.documentId)
     .then(document => {
       if (document == undefined) {
         throw Error(`Document with id #${documentId} was not found.`);
@@ -86,7 +85,7 @@ router.get('/create/:documentId', function(req, res, next) {
 router.post('/create/:documentId', function(req, res, next) {
   var params = req.body;
 
-  db.connection.transaction(createReimbursementTransaction => {
+  models.sequelize.transaction(createReimbursementTransaction => {
     return getDocumentById(req.params.documentId)
       .then(document => {
         console.log('Creating a new Reimbursement document');
@@ -95,13 +94,13 @@ router.post('/create/:documentId', function(req, res, next) {
           params['reimbursement'].forEach(reimbursementParams => {
             console.log(reimbursementParams);
 
-            return model.ReimbursementModel.create(
+            return models.Reimbursement.create(
               {
-                'employee_id': reimbursementParams['employee_id'],
-                'type_id': reimbursementParams['type_id'],
-                'number': reimbursementParams['number'],
-                'date': reimbursementParams['date'],
-                'value': reimbursementParams['value'],
+                employee_id: reimbursementParams['employee_id'],
+                type_id: reimbursementParams['type_id'],
+                number: reimbursementParams['number'],
+                date: reimbursementParams['date'],
+                value: reimbursementParams['value'],
               },
               {
                 createReimbursementTransaction

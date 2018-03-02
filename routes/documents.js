@@ -1,8 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var hbs = require('hbs');
-var db = require('../db');
-var model = require('../model/models.js');
+const express = require('express');
+const router = express.Router();
+const hbs = require('hbs');
+const models = require('../models');
 
 hbs.registerHelper('documentStatusBadge', (status_id) => {
   if (status_id === 1) {
@@ -30,7 +29,7 @@ hbs.registerHelper('documentTypeIcon', (type_id) => {
 
 var getDocumentFormData = (document = undefined) => {
   var formData = {};
-  return model.EmployeeModel
+  return models.Employee
     .findAll(
       { 
         attributes: ['id', 'last_name', 'first_name'],
@@ -43,7 +42,7 @@ var getDocumentFormData = (document = undefined) => {
       });
       formData.employees = employees;
 
-      return model.DocumentTypeModel
+      return models.DocumentType
         .findAll()
         .then(documentTypes => {
           documentTypes.forEach(element => {
@@ -51,7 +50,7 @@ var getDocumentFormData = (document = undefined) => {
           });
           formData.documentTypes = documentTypes;
 
-          return model.DocumentStatusModel
+          return models.DocumentStatus
             .findAll()
             .then(documentStatuses => {
               documentStatuses.forEach(element => {
@@ -59,12 +58,12 @@ var getDocumentFormData = (document = undefined) => {
               });
               formData.documentStatuses = documentStatuses;
 
-              return model.ReimbursementTypeModel
+              return models.ReimbursementType
                 .findAll()
                 .then(reimbursementTypes => {
                   formData.reimbursementTypes = reimbursementTypes;
               
-                  return model.TravelPurposeModel
+                  return models.TravelPurpose
                     .findAll()
                     .then(travelPurposes => {
                       travelPurposes.forEach(element => {
@@ -72,7 +71,7 @@ var getDocumentFormData = (document = undefined) => {
                       });
                       formData.travelPurposes = travelPurposes;
 
-                      return model.TravelDestinationModel
+                      return models.TravelDestination
                         .findAll()
                         .then(travelDestinations => {
                           travelDestinations.forEach(element => {
@@ -90,11 +89,11 @@ var getDocumentFormData = (document = undefined) => {
 };
 
 var createNewDocument = (params, transaction) => {
-  return model.DocumentModel.create(
+  return models.Document.create(
     {
-      'employee_id': params['employee_id'],
-      'status_id': model.DocumentStatusModel.newStatusId,
-      'type_id': params['type_id']
+      employee_id: params['employee_id'],
+      status_id: models.DocumentStatus.build().newStatusId,
+      type_id: params['type_id']
     },
     {
       transaction
@@ -103,17 +102,17 @@ var createNewDocument = (params, transaction) => {
 };
 
 var createNewTravelDocument = (document, params, transaction) => {
-  return model.TravelModel.create(
+  return models.Travel.create(
     {
-      'employee_id': document.employee_id,
-      'purpose_id': params['purpose_id'],
-      'destination_id': params['destination_id'],
-      'date_start': params['date_start'],
-      'date_end': params['date_end'],
-      'departure_leave_time': params['departure_leave_time'],
-      'destination_arrival_time': params['destination_arrival_time'],
-      'destination_leave_time': params['destination_leave_time'],
-      'departure_arrival_time': params['departure_arrival_time']
+      employee_id: document.employee_id,
+      purpose_id: params['purpose_id'],
+      destination_id: params['destination_id'],
+      date_start: params['date_start'],
+      date_end: params['date_end'],
+      departure_leave_time: params['departure_leave_time'],
+      destination_arrival_time: params['destination_arrival_time'],
+      destination_leave_time: params['destination_leave_time'],
+      departure_arrival_time: params['departure_arrival_time']
     },
     {
       transaction
@@ -122,13 +121,13 @@ var createNewTravelDocument = (document, params, transaction) => {
 };
 
 var createNewReimbursementDocument = (document, params, transaction) => {
-  return model.ReimbursementModel.create(
+  return models.Reimbursement.create(
     {
-      'employee_id': params['employee_id'],
-      'type_id': params['type_id'],
-      'number': params['number'],
-      'date': params['date'],
-      'value': params['value'],
+      employee_id: params['employee_id'],
+      type_id: params['type_id'],
+      number: params['number'],
+      date: params['date'],
+      value: params['value'],
     },
     {
       transaction
@@ -137,7 +136,7 @@ var createNewReimbursementDocument = (document, params, transaction) => {
 };
 
 var getDocumentById = documentId => {
-  return model.DocumentModel.findById(
+  return models.Document.findById(
     documentId,
     { 
       include: [{ all: true, nested: true }]
@@ -154,7 +153,7 @@ var getDocumentById = documentId => {
 
 /* GET documents listing. */
 router.get('/', function(req, res, next) {
-  model.DocumentModel.findAll(
+  models.Document.findAll(
     { 
       order: [['status_id', 'ASC'], ['updated_at', 'DESC']], 
       include: ['employee', 'status', 'type', 'reimbursements', 'travel']
@@ -172,7 +171,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/show/:documentId', function(req, res, next) {
-  model.DocumentModel.findById(
+  models.Document.findById(
     req.params.documentId,
     { 
       include: [{ all: true, nested: true }]
@@ -215,12 +214,12 @@ router.get('/create', function(req, res, next) {
 router.post('/create', function(req, res, next) {
   var params = req.body;
 
-  db.connection.transaction(createDocumentTransaction => {
+  models.sequelize.transaction(createDocumentTransaction => {
     return createNewDocument(params['document'], createDocumentTransaction)
       .then(document => {
 
         switch (parseInt(params['document']['type_id'])) {
-          case model.DocumentTypeModel.travelTypeId:
+          case models.DocumentType.build().travelTypeId:
             console.log('Creating a new Travel document');
             return createNewTravelDocument(document, params['travel'], createDocumentTransaction)
               .then(travel => {
@@ -228,7 +227,7 @@ router.post('/create', function(req, res, next) {
                 return document;
               });
       
-          case model.DocumentTypeModel.reimbursementTypeId:
+          case models.DocumentType.build().reimbursementTypeId:
             console.log('Creating a new Reimbursement document');
             return new Promise((resolve, reject) => {
               params['reimbursement'].forEach(reimbursementParams => {
@@ -294,13 +293,13 @@ router.get('/edit/:documentId', function(req, res, next) {
 router.post('/edit/:documentId', function(req, res, next) {
   var params = req.body;
 
-  db.connection.transaction(editDocumentTransaction => {
+  models.sequelize.transaction(editDocumentTransaction => {
     getDocumentById(req.params.documentId)
       .then(document => {
         return document.update(
           {
-            'employee_id': params['document']['employee_id'],
-            'status_id': params['document']['status_id']
+            employee_id: params['document']['employee_id'],
+            status_id: params['document']['status_id']
           },
           {
             editDocumentTransaction
@@ -310,15 +309,15 @@ router.post('/edit/:documentId', function(req, res, next) {
           if (document.isTravel) {
             return document.travel.update(
               {
-                'employee_id': document.employee_id,
-                'purpose_id': params['travel']['purpose_id'],
-                'destination_id': params['travel']['destination_id'],
-                'date_start': params['travel']['date_start'],
-                'date_end': params['travel']['date_end'],
-                'departure_leave_time': params['travel']['departure_leave_time'],
-                'destination_arrival_time': params['travel']['destination_arrival_time'],
-                'destination_leave_time': params['travel']['destination_leave_time'],
-                'departure_arrival_time': params['travel']['departure_arrival_time']
+                employee_id: document.employee_id,
+                purpose_id: params['travel']['purpose_id'],
+                destination_id: params['travel']['destination_id'],
+                date_start: params['travel']['date_start'],
+                date_end: params['travel']['date_end'],
+                departure_leave_time: params['travel']['departure_leave_time'],
+                destination_arrival_time: params['travel']['destination_arrival_time'],
+                destination_leave_time: params['travel']['destination_leave_time'],
+                departure_arrival_time: params['travel']['departure_arrival_time']
               }
             )
             .then(travel => {
@@ -329,11 +328,11 @@ router.post('/edit/:documentId', function(req, res, next) {
               var reimbursementParams = params.reimbursement[reimbursement.id];
               reimbursement.update(
                 {
-                  'employee_id': reimbursementParams['employee_id'],
-                  'type_id': reimbursementParams['type_id'],
-                  'number': reimbursementParams['number'],
-                  'date': reimbursementParams['date'],
-                  'value': reimbursementParams['value'],
+                  employee_id: reimbursementParams['employee_id'],
+                  type_id: reimbursementParams['type_id'],
+                  number: reimbursementParams['number'],
+                  date: reimbursementParams['date'],
+                  value: reimbursementParams['value'],
                 }
               );
             });
