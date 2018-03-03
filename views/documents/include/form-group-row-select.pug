@@ -1,10 +1,6 @@
 mixin optionWidget(option)
   if widgetDefaultValue !== undefined && widgetDefaultValue == option.id
     option(value=option.id selected='selected') #{option.name}
-
-  else if  widgetDefaultValue === undefined  && option.isDefaultValue === undefined && option.isDefaultValue === true
-    option(value=option.id selected='selected') #{option.name}
-  
   else
     option(value=option.id) #{option.name}
 

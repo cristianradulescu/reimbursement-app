@@ -393,26 +393,27 @@
   <text x="180" y="185" style="font-size:14px" id="text392">#{ PLACEHOLDER_EMPLOYEE_JOB_TITLE}</text>
   <text x="93" y="610" style="font-size:12px" id="text394">#{PLACEHOLDER_MANAGER_LAST_NAME}</text>
   <text x="93" y="621" style="font-size:12px" id="text396">#{PLACEHOLDER_MANAGER_FIRST_NAME}</text>
+
   <!-- Reimbursement table -->
-//-   <g id="g3823">
-//-     {%
-//-         set coords = {
-//-           'index': {'x' : 565, 'y': 175},
-//-           'type': {'x': 595, 'y': 175},
-//-           'number': {'x': 777, 'y': 171},
-//-           'date': {'x': 777, 'y': 179},
-//-           'value': {'x': 850, 'y': 175},
-//-         }
-//-     %}
-//-     {% for reimbursement in reimbursement_collection %}
-//-         {% set row_increment = (loop.index - 1) * 20  %}
-//-     <text id="text400" style="font-size:12px" x="{{ coords['index']['x'] }}" y="{{ coords['index']['y'] + row_increment }}">{{ loop.index }}</text>
-//-     <text id="text402" style="font-size:12px" x="{{ coords['type']['x'] }}" y="{{ coords['type']['y'] + row_increment }}">{{ reimbursement.getType()|trans({}, 'messages', 'ro') }}</text>
-//-     <text id="text404" style="font-size:8px" x="{{ coords['number']['x'] }}" y="{{ coords['number']['y'] + row_increment }}">{{ reimbursement.getNumber() }}</text>
-//-     <text id="text436" style="font-size:8px" x="{{ coords['date']['x'] }}" y="{{ coords['date']['y'] + row_increment }}">{{ reimbursement.getDate()|date('d-m-Y') }}</text>
-//-     <text id="text408" style="font-size:12px" x="{{ coords['value']['x'] }}" y="{{ coords['value']['y'] + row_increment }}">{{ reimbursement.getValue() }}</text>
-//-     {% endfor %}
-//-   </g>
+  <g id="g3823">
+    - 
+      var coords = {
+        index: { x: 565, y: 175 }, 
+        type: { x: 595, y: 175 },
+        number: { x: 777, y: 171 },
+        date: { x: 777, y: 179 },
+        value: { x: 850, y: 175 }
+      };
+
+    each reimbursement, loop_index in reimbursements
+      - var row_increment = loop_index * 20
+
+      text(id='text400' style='font-size:12px' x=coords.index.x y=coords.index.y+row_increment) #{loop_index + 1}
+      text(id='text402' style='font-size:12px' x=coords.type.x y=coords.type.y+row_increment) #{reimbursement.type.name}
+      text(id='text404' style='font-size:8px' x=coords.number.x y=coords.number.y+row_increment) #{reimbursement.number}
+      text(id='text436' style='font-size:8px' x=coords.date.x y=coords.date.y+row_increment) #{reimbursement.date}
+      text(id='text408' style='font-size:12px' x=coords.value.x y=coords.value.y+row_increment) #{reimbursement.value}
+  </g>
 
   <!-- /Reimbursement table -->
   <text x="850" y="582" style="font-size:14px" id="text398">#{ PLACEHOLDER_REIMBURSEMENT_TOTAL_AMOUNT }</text>

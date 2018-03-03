@@ -16,11 +16,11 @@ block content
       <legend class="h5">Document ##{document.id}</legend>
 
       - var widgetLabel = 'Employee'; var widgetId = 'employeeSelect'; var widgetName = 'document[employee_id]';
-      - var widgetOptions = formData.employees;
+      - var widgetOptions = formData.employees; var widgetDefaultValue = document.employee_id;
       include include/form-group-row-select.pug
 
       - var widgetLabel = 'Status'; var widgetId = 'documentStatusSelect'; var widgetName = 'document[status_id]';
-      - var widgetOptions = formData.documentStatuses;
+      - var widgetOptions = formData.documentStatuses; var widgetDefaultValue = document.status_id;
       include include/form-group-row-select.pug
 
     </fieldset>
