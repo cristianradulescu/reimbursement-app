@@ -13,6 +13,10 @@ module.exports = function(sequelize, DataTypes) {
       underscored: true,
       timestamps: false,
 
+      defaultScope: {
+        order: [['id', 'ASC']]
+      },
+
       getterMethods: {
         newStatusId() {
           return 1;
