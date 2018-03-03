@@ -1,33 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const hbs = require('hbs');
 const moment = require('moment');
 const models = require('../models');
 const documentService = require('../services/documentService');
-
-hbs.registerHelper('documentStatusBadge', (status_id) => {
-  if (status_id === 1) {
-    return 'danger';
-  }
-
-  if (status_id === 2) {
-    return 'warning';
-  }
-
-  if (status_id === 3) {
-    return 'success';
-  }
-});
-
-hbs.registerHelper('documentTypeIcon', (type_id) => {
-  if (type_id === 1) {
-    return 'truck';
-  }
-
-  if (type_id === 2) {
-    return 'dollar-sign';
-  }
-});
 
 let getDocumentFormData = (document = undefined) => {
   var formData = {};

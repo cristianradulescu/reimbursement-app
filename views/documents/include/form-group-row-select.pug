@@ -1,0 +1,16 @@
+mixin optionWidget(option)
+  if widgetDefaultValue !== undefined && widgetDefaultValue == option.id
+    option(value=option.id selected='selected') #{option.name}
+
+  else if  widgetDefaultValue === undefined  && option.isDefaultValue === undefined && option.isDefaultValue === true
+    option(value=option.id selected='selected') #{option.name}
+  
+  else
+    option(value=option.id) #{option.name}
+
+div(class='form-group row')
+  label(for=widgetId class='col-md-2 col-form-label') #{widgetLabel}
+  div(class='col-md-4')
+    select(class='form-control form-control-sm' id=widgetId name=widgetName required='required')
+      each option in widgetOptions
+        +optionWidget(option)

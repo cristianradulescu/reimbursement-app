@@ -1,0 +1,27 @@
+table(class='table table-sm')
+  tbody
+    tr(class='showpage-container-row')
+      td(scope='row' colspan='2') 
+        strong Travel
+        table(class='table table-sm table-bordered showpage-table-embedded')
+          tbody
+            tr(class='showpage-container-row')
+              th(scope='row') Period
+              
+              - var startDate = periodFormatter(document.travel.date_start) 
+              - var endDate = periodFormatter(document.travel.date_end)
+              td #{startDate} - #{endDate}
+
+            tr(class='showpage-container-row')
+              th(scope='row') Departure times
+
+              - var departureLeave = travelTimesFormatter(document.travel.departure_leave_time)
+              - var destinationArrival = travelTimesFormatter(document.travel.destination_arrival_time)
+              td #{departureLeave} - #{destinationArrival}
+
+            tr(class='showpage-container-row')
+              th(scope='row') Return times
+
+              - var destinationLeave = travelTimesFormatter(document.travel.destination_leave_time)
+              - var departureArrival = travelTimesFormatter(document.travel.departure_arrival_time)
+              td #{destinationLeave} - #{departureArrival}
