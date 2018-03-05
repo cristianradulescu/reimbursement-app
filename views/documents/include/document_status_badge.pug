@@ -1,0 +1,15 @@
+mixin documentStatusBadge()
+  case document.status_id
+    when 1 
+      - var badge_color = 'danger'
+
+    when 2
+      - var badge_color = 'warning'
+
+    when 3
+      - var badge_color = 'success'
+
+  span(class='badge badge-'+badge_color) #{document.status.name}
+
++documentStatusBadge()
+

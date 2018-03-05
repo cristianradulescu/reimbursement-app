@@ -1,33 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const hbs = require('hbs');
 const moment = require('moment');
 const models = require('../models');
 const documentService = require('../services/documentService');
-
-hbs.registerHelper('documentStatusBadge', (status_id) => {
-  if (status_id === 1) {
-    return 'danger';
-  }
-
-  if (status_id === 2) {
-    return 'warning';
-  }
-
-  if (status_id === 3) {
-    return 'success';
-  }
-});
-
-hbs.registerHelper('documentTypeIcon', (type_id) => {
-  if (type_id === 1) {
-    return 'truck';
-  }
-
-  if (type_id === 2) {
-    return 'dollar-sign';
-  }
-});
 
 let getDocumentFormData = (document = undefined) => {
   var formData = {};
@@ -39,25 +14,16 @@ let getDocumentFormData = (document = undefined) => {
       }
     )
     .then(employees => {
-      employees.forEach(element => {
-        element.isDefaultValue = document && (document.employee_id == element.id);
-      });
       formData.employees = employees;
 
       return models.DocumentType
         .findAll()
         .then(documentTypes => {
-          documentTypes.forEach(element => {
-            element.isDefaultValue = document && (document.type_id == element.id);
-          });
           formData.documentTypes = documentTypes;
 
           return models.DocumentStatus
             .findAll()
             .then(documentStatuses => {
-              documentStatuses.forEach(element => {
-                element.isDefaultValue = document && (document.status_id == element.id);
-              });
               formData.documentStatuses = documentStatuses;
 
               return models.ReimbursementType
@@ -68,17 +34,11 @@ let getDocumentFormData = (document = undefined) => {
                   return models.TravelPurpose
                     .findAll()
                     .then(travelPurposes => {
-                      travelPurposes.forEach(element => {
-                        element.isDefaultValue = document && document.isTravel && (document.travel.purpose_id == element.id);
-                      });
                       formData.travelPurposes = travelPurposes;
 
                       return models.TravelDestination
                         .findAll()
                         .then(travelDestinations => {
-                          travelDestinations.forEach(element => {
-                            element.isDefaultValue = document && document.isTravel && (document.travel.destination_id == element.id);
-                          });
                           formData.travelDestinations = travelDestinations;
 
                           return formData;

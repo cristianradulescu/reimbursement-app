@@ -1,0 +1,96 @@
+extends ../layout
+
+block content
+  <form id="editDocumentForm" action="" method="POST">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Navigation">
+      a(class='btn btn-secondary' href='/documents' title='Back to documents')
+        span(data-feather='chevron-left')
+      a(class='btn btn-secondary' href='/documents/show/'+document.id title='Show document')
+        span(data-feather='eye')
+      button(type='submit' class='btn btn-primary')
+        span(data-feather='save')
+    </div>
+    <hr />
+
+    <fieldset class="form-group">
+      <legend class="h5">Document ##{document.id}</legend>
+
+      - var widgetLabel = 'Employee'; var widgetId = 'employeeSelect'; var widgetName = 'document[employee_id]';
+      - var widgetOptions = formData.employees; var widgetDefaultValue = document.employee_id;
+      include include/form-group-row-select.pug
+
+      - var widgetLabel = 'Status'; var widgetId = 'documentStatusSelect'; var widgetName = 'document[status_id]';
+      - var widgetOptions = formData.documentStatuses; var widgetDefaultValue = document.status_id;
+      include include/form-group-row-select.pug
+
+    </fieldset>
+
+    <!-- Travel -->
+    if document.isTravel
+      <fieldset class="form-group">
+        <legend class="h6">Travel details</legend>
+
+        - var widgetLabel = 'Purpose'; var widgetId = 'travelPurposeSelect'; var widgetName = 'travel[purpose_id]';
+        - var widgetOptions = formData.travelPurposes;
+        include include/form-group-row-select.pug
+
+        - var widgetLabel = 'Destination'; var widgetId = 'travelDestinationSelect'; var widgetName = 'travel[destination_id]';
+        - var widgetOptions = formData.travelDestinations;
+        include include/form-group-row-select.pug
+
+        - var widgetLabel = 'Date start'; var widgetId = 'travelDateStartInput'; var widgetName = 'travel[date_start]';
+        - var widgetInputType = 'date'; var widgetValue = document.travel.date_start;
+        include include/form-group-row-input.pug
+
+        - var widgetLabel = 'Date end'; var widgetId = 'travelDateEndInput'; var widgetName = 'travel[date_end]';
+        - var widgetInputType = 'date'; var widgetValue = document.travel.date_end;
+        include include/form-group-row-input.pug
+
+        - var widgetLabel = 'Departure leave'; var widgetId = 'travelDepartureLeaveTimeInput'; var widgetName = 'travel[departure_leave_time]';
+        - var widgetInputType = 'datetime-local'; var widgetValue = datetimeLocalValueFormatter(document.travel.departure_leave_time);
+        include include/form-group-row-input.pug
+
+        - var widgetLabel = 'Destination arrival'; var widgetId = 'travelDestinationArrivalTimeInput'; var widgetName = 'travel[destination_arrival_time]';
+        - var widgetInputType = 'datetime-local'; var widgetValue = datetimeLocalValueFormatter(document.travel.destination_arrival_time);
+        include include/form-group-row-input.pug
+
+        - var widgetLabel = 'Destination leave'; var widgetId = 'travelDestinationLeaveTimeInput'; var widgetName = 'travel[destination_leave_time]';
+        - var widgetInputType = 'datetime-local'; var widgetValue = datetimeLocalValueFormatter(document.travel.destination_leave_time);
+        include include/form-group-row-input.pug
+
+        - var widgetLabel = 'Departure arrival'; var widgetId = 'travelDepartureArrivalTimeInput'; var widgetName = 'travel[departure_arrival_time]';
+        - var widgetInputType = 'datetime-local'; var widgetValue = datetimeLocalValueFormatter(document.travel.departure_arrival_time);
+        include include/form-group-row-input.pug
+
+      </fieldset>
+    <!-- /Travel -->
+
+    <!-- Reimbursement -->
+    if document.isReimbursement
+      each reimbursement in document.reimbursements
+        <fieldset class="form-group">
+          <legend class="h6">Reimbursement #{reimbursement.id}</legend>
+
+          - var widgetLabel = 'Employee'; var widgetId = 'reimbursementEmployeeSelect'; var widgetName = 'reimbursement['+reimbursement.id+'][employee_id]';
+          - var widgetOptions = formData.employees; var widgetDefaultValue = reimbursement.employee_id;
+          include include/form-group-row-select.pug
+
+          - var widgetLabel = 'Type'; var widgetId = 'reimbursementTypeSelect'; var widgetName = 'reimbursement['+reimbursement.id+'][type_id]';
+          - var widgetOptions = formData.reimbursementTypes;
+          include include/form-group-row-select.pug
+
+          - var widgetLabel = 'Value'; var widgetId = 'reimbursementValueInput'; var widgetName = 'reimbursement['+reimbursement.id+'][value]';
+          - var widgetInputType = 'number'; var widgetValue = reimbursement.value;
+          include include/form-group-row-input.pug
+
+          - var widgetLabel = 'Date'; var widgetId = 'reimbursementDateInput'; var widgetName = 'reimbursement['+reimbursement.id+'][date]';
+          - var widgetInputType = 'date'; var widgetValue = reimbursement.date;
+          include include/form-group-row-input.pug
+
+          - var widgetLabel = 'Number'; var widgetId = 'reimbursementDocumentNumberInput'; var widgetName = 'reimbursement['+reimbursement.id+'][number]';
+          - var widgetInputType = 'text'; var widgetValue = reimbursement.number;
+          include include/form-group-row-input.pug
+          
+        </fieldset>
+    <!-- /Reimbursement -->
+  </form>

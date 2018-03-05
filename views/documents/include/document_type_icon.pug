@@ -1,0 +1,10 @@
+mixin documentTypeIcon()
+  case document.type_id
+    when 1
+      - var icon = 'truck'
+    when 2
+      - var icon = 'dollar-sign'
+
+  span(data-feather=icon)
+
++documentTypeIcon()

@@ -1,0 +1,18 @@
+table(class='table table-sm')
+  tbody
+    tr(class='showpage-container-row')
+      td(scope='row' colspan='2') 
+        strong Reimbursements
+        table(class='table table-sm table-bordered showpage-table-embedded')
+          thead(class='thead-dark')
+            th Employee
+            th Type
+            th Value
+            th Number / Date
+          tbody
+            each reimbursement in document.reimbursements
+              tr
+                td #{reimbursement.employee.name}
+                td #{reimbursement.type.name}
+                td #{reimbursement.value}
+                td #{reimbursement.number} / #{reimbursement.date}

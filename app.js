@@ -4,8 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var hbs = require('hbs');
-var swag = require('swag');
+var moment = require('moment');
 
 var index = require('./routes/index');
 var documents = require('./routes/documents');
@@ -16,10 +15,24 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+app.set('view engine', 'pug');
 
-hbs.registerPartials(path.join(__dirname, 'views/documents/partials'));
-swag.registerHelpers(hbs);
+// view helpers
+app.locals.timestampFormatter = (date) => {
+  return moment(date).format('DD.MM.YYYY HH:mm:ss');
+};
+
+app.locals.periodFormatter = (date) => {
+  return moment(date).format('DD.MM.YYYY');
+};
+
+app.locals.travelTimesFormatter = (date) => {
+  return moment(date).format('DD.MM.YYYY HH:mm');
+};
+
+app.locals.datetimeLocalValueFormatter = (date) => {
+  return moment(date).format('YYYY-MM-DDTHH:mm:ss');
+} 
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
