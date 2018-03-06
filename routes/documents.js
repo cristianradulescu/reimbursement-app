@@ -15,39 +15,45 @@ let getDocumentFormData = (document = undefined) => {
     )
     .then(employees => {
       formData.employees = employees;
-
+    })
+    .then(() => {
       return models.DocumentType
         .findAll()
         .then(documentTypes => {
           formData.documentTypes = documentTypes;
-
-          return models.DocumentStatus
-            .findAll()
-            .then(documentStatuses => {
-              formData.documentStatuses = documentStatuses;
-
-              return models.ReimbursementType
-                .findAll()
-                .then(reimbursementTypes => {
-                  formData.reimbursementTypes = reimbursementTypes;
-              
-                  return models.TravelPurpose
-                    .findAll()
-                    .then(travelPurposes => {
-                      formData.travelPurposes = travelPurposes;
-
-                      return models.TravelDestination
-                        .findAll()
-                        .then(travelDestinations => {
-                          formData.travelDestinations = travelDestinations;
-
-                          return formData;
-                        })
-                    });
-                });
-            });
-        });
-    });
+        })
+    })
+    .then(() =>  {
+      return models.DocumentStatus
+        .findAll()
+        .then(documentStatuses => {
+         formData.documentStatuses = documentStatuses;
+        })
+    })
+    .then(() => {
+        return models.ReimbursementType
+          .findAll()
+          .then(reimbursementTypes => {
+            formData.reimbursementTypes = reimbursementTypes;
+          })
+    })
+    .then(() => {
+      return models.TravelPurpose
+        .findAll()
+        .then(travelPurposes => {
+          formData.travelPurposes = travelPurposes;
+        })
+    })
+    .then(() => {
+      return models.TravelDestination
+        .findAll()
+        .then(travelDestinations => {
+          formData.travelDestinations = travelDestinations;
+        })
+    })
+    .then(() => {
+      return formData;
+    })
 };
 
 let printTravelDocument = (res, document) => {
